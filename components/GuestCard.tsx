@@ -23,23 +23,27 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
     setIsDownloading(true);
 
     try {
-      // Capture the card with optimized settings for size
-      // Scale 3 ensures high quality for printing (approx 300dpi)
+      // Wait a moment for any layout shifts to settle
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Capture the card with optimized settings
       const canvas = await html2canvas(cardRef.current, {
-        scale: 3, 
+        scale: 4, // High resolution (approx 400dpi equivalent)
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
-        // Fix for potential scroll/positioning issues during capture
+        // Critical: Force the capture context to avoid scroll offsets cropping the image
         scrollX: 0,
         scrollY: 0,
+        windowWidth: document.documentElement.offsetWidth,
+        windowHeight: document.documentElement.offsetHeight,
       });
 
-      // Use JPEG with 0.9 quality for good balance of size and quality
-      const imgData = canvas.toDataURL('image/jpeg', 0.9);
+      // Use PNG for lossless quality (sharper text and QR code)
+      const imgData = canvas.toDataURL('image/png');
       
       // Calculate dimensions (matches 9:16 aspect ratio)
-      // Standard printable width, e.g., 90mm x 160mm
+      // Standard printable width: 90mm x 160mm
       const pdfWidth = 90; 
       const pdfHeight = 160; 
       
@@ -49,10 +53,13 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
         format: [pdfWidth, pdfHeight]
       });
 
-      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       
-      // Updated filename format
-      pdf.save(`GuestPass Premium - ${config.ssid}.pdf`);
+      // Sanitize filename to remove characters that might break file saving
+      const safeSSID = config.ssid.replace(/[^a-z0-9\s\-_]/gi, '').trim();
+      const filename = `GuestPass Premium - ${safeSSID || 'Network'}.pdf`;
+      
+      pdf.save(filename);
     } catch (error) {
       console.error('PDF Generation failed', error);
       alert('Could not generate PDF. Please try printing instead.');
