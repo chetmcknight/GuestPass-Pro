@@ -82,7 +82,7 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
 
           {/* Prominent QR Code - Centered in remaining space */}
           <div className="w-full flex-grow flex items-center justify-center px-2 mb-6 min-h-0">
-            <div className="w-full max-w-[200px] aspect-square flex items-center justify-center">
+            <div className="w-full max-w-[200px] aspect-square flex items-center justify-center p-4">
               <img 
                 src={qrDataUrl} 
                 alt="WiFi QR Code" 
