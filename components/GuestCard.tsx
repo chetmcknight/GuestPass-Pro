@@ -28,22 +28,36 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
 
       // Capture the card with optimized settings
       const canvas = await html2canvas(cardRef.current, {
-        scale: 4, // High resolution (approx 400dpi equivalent)
+        scale: 3, // Slightly reduced scale for better stability
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
-        // Critical: Force the capture context to avoid scroll offsets cropping the image
         scrollX: 0,
         scrollY: 0,
-        windowWidth: document.documentElement.offsetWidth,
-        windowHeight: document.documentElement.offsetHeight,
+        // Critical: Handle styles that break html2canvas in the clone
+        onclone: (clonedDoc) => {
+          const element = clonedDoc.querySelector('.guest-card-container') as HTMLElement;
+          const qrImage = clonedDoc.querySelector('.qr-code-img') as HTMLElement;
+          
+          if (element) {
+            // Remove shadows and animations which can cause clipping or offsets
+            element.style.boxShadow = 'none';
+            element.style.animation = 'none';
+            element.style.transform = 'none';
+            // Ensure flat white background
+            element.style.background = '#ffffff'; 
+          }
+          
+          if (qrImage) {
+            // Remove mix-blend-mode which html2canvas struggles with
+            qrImage.style.mixBlendMode = 'normal';
+          }
+        }
       });
 
-      // Use PNG for lossless quality (sharper text and QR code)
+      // Use PNG for lossless quality
       const imgData = canvas.toDataURL('image/png');
       
-      // Calculate dimensions (matches 9:16 aspect ratio)
-      // Standard printable width: 90mm x 160mm
       const pdfWidth = 90; 
       const pdfHeight = 160; 
       
@@ -55,7 +69,6 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
 
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       
-      // Sanitize filename to remove characters that might break file saving
       const safeSSID = config.ssid.replace(/[^a-z0-9\s\-_]/gi, '').trim();
       const filename = `GuestPass Premium - ${safeSSID || 'Network'}.pdf`;
       
@@ -97,7 +110,7 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
               <img 
                 src={qrDataUrl} 
                 alt="WiFi QR Code" 
-                className="w-full h-full object-contain mix-blend-multiply" 
+                className="qr-code-img w-full h-full object-contain mix-blend-multiply" 
               />
             </div>
           </div>
