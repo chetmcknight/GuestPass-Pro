@@ -24,17 +24,19 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
 
     try {
       // Capture the card with optimized settings for size
-      // Scale 2 is enough for print quality (approx 300dpi for small prints) but keeps file size low
+      // Scale 3 ensures high quality for printing (approx 300dpi)
       const canvas = await html2canvas(cardRef.current, {
-        scale: 2, 
+        scale: 3, 
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
+        // Fix for potential scroll/positioning issues during capture
+        scrollX: 0,
+        scrollY: 0,
       });
 
-      // Use JPEG with 0.8 quality to drastically reduce file size (~300kb target)
-      // Since background is white, we don't need PNG transparency
-      const imgData = canvas.toDataURL('image/jpeg', 0.8);
+      // Use JPEG with 0.9 quality for good balance of size and quality
+      const imgData = canvas.toDataURL('image/jpeg', 0.9);
       
       // Calculate dimensions (matches 9:16 aspect ratio)
       // Standard printable width, e.g., 90mm x 160mm
@@ -48,7 +50,9 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
       });
 
       pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${config.ssid}-guest-pass.pdf`);
+      
+      // Updated filename format
+      pdf.save(`GuestPass Premium - ${config.ssid}.pdf`);
     } catch (error) {
       console.error('PDF Generation failed', error);
       alert('Could not generate PDF. Please try printing instead.');
