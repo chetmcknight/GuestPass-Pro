@@ -23,15 +23,18 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
     setIsDownloading(true);
 
     try {
-      // Capture the card with high scale for clarity
+      // Capture the card with optimized settings for size
+      // Scale 2 is enough for print quality (approx 300dpi for small prints) but keeps file size low
       const canvas = await html2canvas(cardRef.current, {
-        scale: 4, // Higher scale for crisp text
+        scale: 2, 
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
       });
 
-      const imgData = canvas.toDataURL('image/png');
+      // Use JPEG with 0.8 quality to drastically reduce file size (~300kb target)
+      // Since background is white, we don't need PNG transparency
+      const imgData = canvas.toDataURL('image/jpeg', 0.8);
       
       // Calculate dimensions (matches 9:16 aspect ratio)
       // Standard printable width, e.g., 90mm x 160mm
@@ -44,7 +47,7 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
         format: [pdfWidth, pdfHeight]
       });
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(`${config.ssid}-guest-pass.pdf`);
     } catch (error) {
       console.error('PDF Generation failed', error);
@@ -64,7 +67,10 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
           className="guest-card-container bg-white rounded-[1.5rem] p-6 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.6)] text-slate-900 w-full aspect-[9/16] flex flex-col items-center overflow-hidden relative"
         >
           {/* Top WiFi Icon Badge */}
-          <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mb-6 mt-4 shadow-lg shrink-0">
+          <div 
+            className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mb-6 mt-4 shadow-lg shrink-0"
+            style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
+          >
             <Wifi size={24} className="text-white" />
           </div>
 
