@@ -1,11 +1,9 @@
-
 import React, { useState } from 'react';
 import WifiForm from './components/WifiForm';
 import GuestCard from './components/GuestCard';
 import { WifiConfig, QRResult } from './types';
 import { generateQRCode } from './services/qrService';
-import { generateAIWelcome } from './services/geminiService';
-import { Github, Heart, Wifi } from 'lucide-react';
+import { Github, Printer, Wifi } from 'lucide-react';
 
 const App: React.FC = () => {
   const [result, setResult] = useState<QRResult | null>(null);
@@ -14,48 +12,46 @@ const App: React.FC = () => {
   const handleGenerate = async (config: WifiConfig) => {
     setLoading(true);
     try {
-      // Parallel generation: QR Code and AI Welcome Message
-      const [qrDataUrl, welcomeMessage] = await Promise.all([
-        generateQRCode(config),
-        generateAIWelcome(config.ssid)
-      ]);
-
+      // 1. Generate QR Code locally (Instant)
+      const qrDataUrl = await generateQRCode(config);
+      
+      // 2. Show the result immediately
       setResult({
         qrDataUrl,
         config: {
           ...config,
-          welcomeMessage
-        }
+          welcomeMessage: "" 
+        },
+        isAiLoading: false
       });
+      
+      setLoading(false);
     } catch (error) {
       console.error("Failed to generate guest card", error);
-      alert("Something went wrong generating your card. Please try again.");
-    } finally {
+      alert("Something went wrong. Please try again.");
       setLoading(false);
     }
   };
 
   return (
-    <div className="relative min-h-screen selection:bg-indigo-500/30">
-      {/* Background Orbs */}
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none opacity-50">
-        <div className="absolute top-[10%] left-[10%] w-[30rem] h-[30rem] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[10%] right-[10%] w-[40rem] h-[40rem] bg-violet-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
+    <div className="relative min-h-screen selection:bg-[#ff3152]/30 bg-[#050505] overflow-hidden">
+      {/* Premium Mesh Background */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-purple-900/20 rounded-full blur-[120px]" />
+        <div className="absolute top-[20%] right-[-10%] w-[60%] h-[60%] bg-[#ff3152]/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] bg-blue-900/20 rounded-full blur-[120px]" />
       </div>
 
-      <div className="container mx-auto px-4 py-12 flex flex-col items-center">
+      <div className="container mx-auto px-4 py-16 flex flex-col items-center relative z-10">
         {/* Header */}
-        <header className="mb-12 text-center no-print">
-          <div className="flex items-center justify-center space-x-3 mb-4">
-            <div className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center text-indigo-600 transform -rotate-6">
-              <Wifi size={28} />
-            </div>
-            <h1 className="text-4xl md:text-6xl font-extrabold text-white font-outfit tracking-tight">
-              Guest<span className="text-indigo-400">Pass</span>
+        <header className="mb-16 text-center no-print">
+          <div className="flex items-center justify-center space-x-3 mb-6">
+            <h1 className="text-4xl md:text-7xl font-extrabold text-white font-outfit tracking-tighter drop-shadow-2xl">
+              GuestPass<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff3152] to-[#ff8c31]"> Premium</span>
             </h1>
           </div>
-          <p className="text-indigo-200/60 max-w-lg mx-auto text-lg leading-relaxed">
-            Beautiful WiFi QR codes for your home or office. Provide a seamless experience for your guests with premium printable cards.
+          <p className="text-slate-400 max-w-lg mx-auto text-lg leading-relaxed font-medium">
+            Generate beautiful, scan-to-connect WiFi cards for your guests instantly.
           </p>
         </header>
 
@@ -65,41 +61,34 @@ const App: React.FC = () => {
         </main>
 
         {/* Features / Benefits */}
-        <section className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl no-print">
-          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all group">
-            <div className="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 group-hover:scale-110 transition-transform">
+        <section className="mt-28 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl no-print w-full px-4">
+          <div className="p-8 rounded-3xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all group backdrop-blur-sm">
+            <div className="w-12 h-12 rounded-2xl bg-[#ff3152]/10 flex items-center justify-center text-[#ff3152] mb-6 group-hover:scale-110 transition-transform shadow-[0_0_15px_-3px_rgba(255,49,82,0.3)]">
               <Wifi size={24} />
             </div>
-            <h3 className="text-lg font-bold text-white mb-2 font-outfit">Instant Scan</h3>
-            <p className="text-indigo-200/50 text-sm">Guests scan the QR code with their camera app to join the network automatically. No typing required.</p>
+            <h3 className="text-xl font-bold text-white mb-3 font-outfit">Instant Scan</h3>
+            <p className="text-slate-500 text-sm leading-relaxed">Join the network automatically. No manual typing required.</p>
           </div>
-          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all group">
-            <div className="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center text-pink-400 mb-4 group-hover:scale-110 transition-transform">
-              <Heart size={24} />
+          <div className="p-8 rounded-3xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all group backdrop-blur-sm">
+            <div className="w-12 h-12 rounded-2xl bg-[#ff8c31]/10 flex items-center justify-center text-[#ff8c31] mb-6 group-hover:scale-110 transition-transform shadow-[0_0_15px_-3px_rgba(255,140,49,0.3)]">
+              <Printer size={24} />
             </div>
-            <h3 className="text-lg font-bold text-white mb-2 font-outfit">AI Powered</h3>
-            <p className="text-indigo-200/50 text-sm">Uses Gemini AI to generate personalized welcome notes for your network, making your guests feel at home.</p>
+            <h3 className="text-xl font-bold text-white mb-3 font-outfit">Print Ready</h3>
+            <p className="text-slate-500 text-sm leading-relaxed">Perfectly formatted for printing or saving as a high-quality PDF.</p>
           </div>
-          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all group">
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-110 transition-transform">
+          <div className="p-8 rounded-3xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all group backdrop-blur-sm">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 mb-6 group-hover:scale-110 transition-transform shadow-[0_0_15px_-3px_rgba(99,102,241,0.3)]">
               <Github size={24} />
             </div>
-            <h3 className="text-lg font-bold text-white mb-2 font-outfit">Privacy First</h3>
-            <p className="text-indigo-200/50 text-sm">All processing happens in-memory. We never store your SSID or WiFi passwords. Security is our priority.</p>
+            <h3 className="text-xl font-bold text-white mb-3 font-outfit">Fast & Secure</h3>
+            <p className="text-slate-500 text-sm leading-relaxed">Optimized local processing ensures your card is ready in milliseconds.</p>
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="mt-24 text-center text-indigo-200/30 text-xs no-print flex flex-col items-center gap-4">
-          <div className="flex items-center space-x-1">
-            <span>Built with</span>
-            <Heart size={12} className="text-pink-500 fill-pink-500" />
-            <span>for visitors everywhere</span>
-          </div>
-          <p>© 2026 Chet McKnight. All rights reserved.</p>
+        <footer className="mt-32 text-center text-slate-600 text-sm no-print">
+          <p>© 2026 GuestPass Premium</p>
         </footer>
 
-        {/* Modal Overlay for Card */}
         {result && <GuestCard result={result} onClose={() => setResult(null)} />}
       </div>
     </div>

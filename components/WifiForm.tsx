@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Wifi, Lock, Eye, EyeOff, ShieldCheck, Sparkles, Loader2 } from 'lucide-react';
+import { Wifi, Lock, Eye, EyeOff, ShieldCheck, Sparkles, Loader2, ArrowRight } from 'lucide-react';
 import { WifiConfig, SecurityType } from '../types';
 
 interface WifiFormProps {
@@ -25,108 +25,105 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
   return (
     <form 
       onSubmit={handleSubmit}
-      className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 shadow-2xl space-y-6 w-full max-w-md mx-auto"
+      className="bg-[#111111] border border-white/5 rounded-[2.5rem] p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] w-full max-w-md mx-auto relative overflow-hidden"
     >
-      <div className="text-center space-y-2 mb-8">
-        <div className="inline-flex p-3 bg-indigo-500/20 rounded-2xl text-indigo-400 mb-2">
-          <Wifi size={32} />
-        </div>
-        <h2 className="text-2xl font-bold text-white font-outfit">Configure Guest WiFi</h2>
-        <p className="text-indigo-200/60 text-sm">Enter your network details to generate a card.</p>
+      {/* Floating Glowing Icon */}
+      <div className="absolute top-10 right-10 w-12 h-12 bg-gradient-to-br from-[#ff5f3d] to-[#ff3152] rounded-full flex items-center justify-center text-white shadow-[0_0_25px_rgba(255,49,82,0.4)]">
+        <Wifi size={24} />
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-1 mb-10">
+        <h2 className="text-3xl font-bold text-white font-outfit tracking-tight">
+          GuestPass<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff3152] to-[#ff8c31]"> Premium</span>
+        </h2>
+        <p className="text-slate-500 text-sm font-medium">New network setup</p>
+      </div>
+
+      <div className="space-y-8">
         {/* SSID Input */}
-        <div className="space-y-1">
-          <label className="text-xs font-semibold text-indigo-300 uppercase tracking-wider ml-1">Network Name (SSID)</label>
-          <div className="relative group">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-white/40 group-focus-within:text-indigo-400 transition-colors">
-              <Wifi size={18} />
-            </div>
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Network Name</label>
+          <div className="relative">
             <input
               required
               type="text"
-              placeholder="e.g. MyHome_5G"
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+              placeholder="e.g. MySuperFastWiFi"
+              className="w-full bg-[#1a1a1a] border-none rounded-2xl py-4 px-6 text-white placeholder-slate-700 focus:outline-none focus:ring-1 focus:ring-[#ff3152]/30 transition-all font-medium"
               value={config.ssid}
               onChange={(e) => setConfig({ ...config, ssid: e.target.value })}
             />
           </div>
         </div>
 
-        {/* Password Input (Conditionally Rendered) */}
-        {config.security !== 'nopass' && (
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-indigo-300 uppercase tracking-wider ml-1">Password</label>
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-white/40 group-focus-within:text-indigo-400 transition-colors">
-                <Lock size={18} />
-              </div>
-              <input
-                required
-                type={showPassword ? "text" : "password"}
-                placeholder="********"
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-12 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
-                value={config.password}
-                onChange={(e) => setConfig({ ...config, password: e.target.value })}
-              />
+        {/* Password Input */}
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Password</label>
+          <div className="relative group">
+            <input
+              required={config.security !== 'nopass'}
+              disabled={config.security === 'nopass'}
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              className="w-full bg-[#1a1a1a] border-none rounded-2xl py-4 px-6 text-white placeholder-slate-700 focus:outline-none focus:ring-1 focus:ring-[#ff3152]/30 transition-all font-medium disabled:opacity-30"
+              value={config.password}
+              onChange={(e) => setConfig({ ...config, password: e.target.value })}
+            />
+            {config.security !== 'nopass' && (
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/40 hover:text-white transition-colors"
+                className="absolute inset-y-0 right-0 pr-5 flex items-center text-slate-600 hover:text-white transition-colors"
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
-            </div>
+            )}
           </div>
-        )}
-
-        {/* Hidden Toggle */}
-        <div className="flex items-center space-x-3 ml-1 pt-2">
-          <button
-            type="button"
-            onClick={() => setConfig({ ...config, hidden: !config.hidden })}
-            className={`w-12 h-6 rounded-full transition-colors relative ${config.hidden ? 'bg-indigo-600' : 'bg-white/20'}`}
-          >
-            <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${config.hidden ? 'translate-x-6' : ''}`} />
-          </button>
-          <span className="text-sm text-indigo-100/80">Hidden Network</span>
         </div>
 
-        {/* Security Select (Moved to last position) */}
-        <div className="space-y-1">
-          <label className="text-xs font-semibold text-indigo-300 uppercase tracking-wider ml-1">Security Type</label>
-          <div className="relative group">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-white/40">
-              <ShieldCheck size={18} />
-            </div>
+        <button
+          disabled={isLoading || !config.ssid}
+          type="submit"
+          className="w-full relative group"
+        >
+          {/* Background Glow */}
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-[#ff3152] to-[#ff8c31] rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
+          
+          <div className="relative flex items-center justify-center space-x-2 w-full bg-gradient-to-r from-[#ff3152] to-[#ff8c31] text-white font-bold py-5 rounded-2xl shadow-xl transition-all active:scale-[0.97]">
+            {isLoading ? (
+              <Loader2 className="animate-spin" size={20} />
+            ) : (
+              <>
+                <span className="text-lg">Generate Card</span>
+                <ArrowRight size={20} />
+              </>
+            )}
+          </div>
+        </button>
+
+        {/* Custom Security and Signal Footer */}
+        <div className="pt-8 border-t border-white/5 flex items-end justify-between">
+          <div className="space-y-1">
+            <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest block">Security</span>
             <select
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all appearance-none cursor-pointer"
+              className="bg-transparent border-none text-white font-bold p-0 focus:ring-0 cursor-pointer appearance-none hover:text-[#ff3152] transition-colors"
               value={config.security}
               onChange={(e) => setConfig({ ...config, security: e.target.value as SecurityType })}
             >
-              <option value="WPA" className="bg-slate-900">WPA/WPA2/WPA3 (Recommended)</option>
-              <option value="WEP" className="bg-slate-900">WEP (Legacy)</option>
-              <option value="nopass" className="bg-slate-900">None (Open Network)</option>
+              <option value="WPA" className="bg-[#111111]">WPA2/3</option>
+              <option value="WEP" className="bg-[#111111]">WEP</option>
+              <option value="nopass" className="bg-[#111111]">Open</option>
             </select>
+          </div>
+
+          {/* Visual Signal Bars */}
+          <div className="flex items-end gap-1 mb-1">
+            <div className="w-1.5 h-3 bg-slate-800 rounded-sm"></div>
+            <div className="w-1.5 h-4 bg-slate-800 rounded-sm"></div>
+            <div className="w-1.5 h-6 bg-[#ff3152] rounded-sm shadow-[0_0_8px_#ff3152]"></div>
+            <div className="w-1.5 h-4 bg-slate-800 rounded-sm"></div>
           </div>
         </div>
       </div>
-
-      <button
-        disabled={isLoading || !config.ssid}
-        type="submit"
-        className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-500/20 flex items-center justify-center space-x-2 transition-all active:scale-[0.98]"
-      >
-        {isLoading ? (
-          <Loader2 className="animate-spin" size={20} />
-        ) : (
-          <>
-            <Sparkles size={20} />
-            <span>Generate Guest Card</span>
-          </>
-        )}
-      </button>
     </form>
   );
 };

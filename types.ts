@@ -12,4 +12,5 @@ export interface WifiConfig {
 export interface QRResult {
   qrDataUrl: string;
   config: WifiConfig;
+  isAiLoading?: boolean;
 }

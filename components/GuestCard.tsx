@@ -1,6 +1,5 @@
-
 import React, { useRef, useState } from 'react';
-import { Printer, Download, X, Wifi, Shield, FileText, Loader2 } from 'lucide-react';
+import { Printer, Wifi, Download, Loader2 } from 'lucide-react';
 import { QRResult } from '../types';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
@@ -13,178 +12,126 @@ interface GuestCardProps {
 const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
   const { qrDataUrl, config } = result;
   const cardRef = useRef<HTMLDivElement>(null);
-  const [isExporting, setIsExporting] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const handlePrint = () => {
     window.print();
   };
 
-  const captureCard = async (): Promise<HTMLCanvasElement | null> => {
-    if (!cardRef.current) return null;
-    setIsExporting(true);
+  const handleDownloadPDF = async () => {
+    if (!cardRef.current) return;
+    setIsDownloading(true);
+
     try {
+      // Capture the card with high scale for clarity
       const canvas = await html2canvas(cardRef.current, {
-        scale: 3,
+        scale: 4, // Higher scale for crisp text
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
-        onclone: (clonedDoc) => {
-          const element = clonedDoc.querySelector('.guest-card-container') as HTMLElement;
-          if (element) {
-            element.style.borderRadius = '32px';
-            element.style.boxShadow = 'none';
-          }
-        }
       });
-      return canvas;
+
+      const imgData = canvas.toDataURL('image/png');
+      
+      // Calculate dimensions (matches 9:16 aspect ratio)
+      // Standard printable width, e.g., 90mm x 160mm
+      const pdfWidth = 90; 
+      const pdfHeight = 160; 
+      
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: [pdfWidth, pdfHeight]
+      });
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`${config.ssid}-guest-pass.pdf`);
     } catch (error) {
-      console.error("Failed to capture card:", error);
-      return null;
+      console.error('PDF Generation failed', error);
+      alert('Could not generate PDF. Please try printing instead.');
     } finally {
-      setIsExporting(false);
+      setIsDownloading(false);
     }
   };
 
-  const handleDownloadImage = async () => {
-    const canvas = await captureCard();
-    if (!canvas) return;
-    
-    const image = canvas.toDataURL("image/png");
-    const link = document.createElement('a');
-    link.href = image;
-    link.download = `GuestPass_${config.ssid}.png`;
-    link.click();
-  };
-
-  const handleDownloadPDF = async () => {
-    const canvas = await captureCard();
-    if (!canvas) return;
-
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF({
-      orientation: 'landscape',
-      unit: 'px',
-      format: [canvas.width / 3, canvas.height / 3]
-    });
-
-    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width / 3, canvas.height / 3);
-    pdf.save(`GuestPass_${config.ssid}.pdf`);
-  };
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-in fade-in duration-300 guest-card-overlay">
-      <div className="relative w-full max-w-3xl">
-        <div className="absolute -top-12 left-0 right-0 flex justify-between items-center text-white px-4 no-print">
-          <p className="text-sm font-medium opacity-70 italic">Tip: You can print, or download as Image/PDF</p>
-          <button 
-            onClick={onClose}
-            className="p-1 hover:bg-white/10 rounded-full transition-colors"
-          >
-            <X size={24} />
-          </button>
-        </div>
-
-        {/* Card Canvas */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300 guest-card-overlay overflow-y-auto">
+      <div className="relative w-full max-w-[360px] my-auto flex flex-col items-center">
+        
+        {/* The Card Component - Precise 9:16 Portrait Layout */}
         <div 
           ref={cardRef}
-          className="guest-card-container bg-white rounded-[2.5rem] p-12 shadow-2xl text-slate-900 overflow-hidden w-full"
+          className="guest-card-container bg-white rounded-[1.5rem] p-6 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.6)] text-slate-900 w-full aspect-[9/16] flex flex-col items-center overflow-hidden relative"
         >
-          <div className="flex flex-col md:flex-row gap-12 items-stretch">
-            {/* Left Column: QR Code Section */}
-            <div className="w-full md:w-[45%] flex flex-col items-center">
-              <div className="bg-[#f1f3f5] p-6 rounded-[2.5rem] w-full flex items-center justify-center aspect-square mb-6">
-                <img src={qrDataUrl} alt="WiFi QR Code" className="w-full h-full object-contain mix-blend-multiply" />
-              </div>
-              <p className="text-[14px] text-[#94a3b8] font-bold uppercase tracking-[0.25em] text-center">Scan to Connect</p>
+          {/* Top WiFi Icon Badge */}
+          <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mb-6 mt-4 shadow-lg shrink-0">
+            <Wifi size={24} className="text-white" />
+          </div>
+
+          {/* Centered Typography */}
+          <div className="text-center mb-6 shrink-0">
+            <h2 className="text-3xl font-bold text-slate-900 mb-1 tracking-tight">WiFi</h2>
+            <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Scan to connect</p>
+          </div>
+
+          {/* Prominent QR Code - Centered in remaining space */}
+          <div className="w-full flex-grow flex items-center justify-center px-2 mb-6 min-h-0">
+            <div className="w-full max-w-[200px] aspect-square flex items-center justify-center">
+              <img 
+                src={qrDataUrl} 
+                alt="WiFi QR Code" 
+                className="w-full h-full object-contain mix-blend-multiply" 
+              />
+            </div>
+          </div>
+
+          {/* Information Detail Boxes */}
+          <div className="w-full space-y-3 mb-8 shrink-0">
+            {/* Network Name Container */}
+            <div className="bg-[#f3f4f6]/80 p-3.5 rounded-xl text-center w-full border border-slate-100/50">
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Network</span>
+              <p className="text-base font-bold font-outfit break-all text-slate-800 leading-tight">{config.ssid}</p>
             </div>
 
-            {/* Right Column: Information Section */}
-            <div className="w-full md:w-[55%] flex flex-col justify-between pt-2">
-              <div className="space-y-6">
-                <div className="flex justify-start">
-                  <div className="px-5 py-1.5 bg-[#eef2ff] text-[#4f46e5] rounded-full text-[13px] font-extrabold uppercase tracking-widest">
-                    Guest WiFi
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <h4 className="text-5xl font-black font-outfit text-[#0f172a] tracking-tight">{config.ssid}</h4>
-                  {config.welcomeMessage && (
-                     <p className="text-[#64748b] italic text-lg font-medium leading-snug">"{config.welcomeMessage}"</p>
-                  )}
-                </div>
-
-                <div className="h-[1px] bg-[#f1f5f9] w-full my-6"></div>
-
-                <div className="space-y-5">
-                  <div className="space-y-1.5">
-                    <span className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-[0.15em]">Network Name</span>
-                    <p className="text-xl font-bold text-[#1e293b] font-outfit">{config.ssid}</p>
-                  </div>
-                  
-                  {config.security !== 'nopass' && (
-                    <div className="flex items-center space-x-4">
-                      <span className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-[0.15em] whitespace-nowrap">Password</span>
-                      <div className="bg-[#f8fafc] px-5 py-2.5 rounded-2xl border border-[#f1f5f9]">
-                        <p className="text-xl font-bold text-[#0f172a] font-outfit tracking-tight">
-                          {config.password}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="flex items-center text-[12px] font-bold text-[#6366f1] uppercase tracking-wider pt-2">
-                    <Shield size={16} className="mr-2" />
-                    Secure {config.security} Network
-                  </div>
-                </div>
+            {/* Password Container - Only shown if security is not open */}
+            {config.security !== 'nopass' && config.password && (
+              <div className="bg-[#f3f4f6]/80 p-3.5 rounded-xl text-center w-full border border-slate-100/50 animate-in fade-in slide-in-from-bottom-1 duration-500">
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Password</span>
+                <p className="text-base font-bold font-outfit break-all text-slate-800 leading-tight">{config.password}</p>
               </div>
-
-              {/* Card Footer */}
-              <div className="pt-10 flex items-center justify-between text-[11px] text-[#cbd5e1] font-bold uppercase tracking-wider">
-                <span>GUESTPASS GENERATOR</span>
-                <span className="w-1.5 h-1.5 bg-[#e2e8f0] rounded-full mx-2"></span>
-                <span>FAST & SECURE</span>
-              </div>
-            </div>
+            )}
+          </div>
+          
+          {/* Subtle footer credit */}
+          <div className="text-[7px] text-slate-300 font-black uppercase tracking-[0.2em] mt-auto mb-4">
+            GuestPass Premium
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 no-print">
+        <div className="mt-6 w-full grid grid-cols-2 gap-3 no-print px-2">
           <button 
-            disabled={isExporting}
             onClick={handlePrint}
-            className="bg-white text-indigo-600 hover:bg-slate-50 font-bold py-4 px-2 rounded-2xl shadow-xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 text-xs disabled:opacity-50"
+            className="col-span-1 bg-white text-black font-bold py-3.5 rounded-xl shadow-xl hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm"
           >
-            <Printer size={20} />
-            <span>Print Card</span>
+            <Printer size={18} />
+            <span>Print</span>
           </button>
           
           <button 
-            disabled={isExporting}
-            onClick={handleDownloadImage}
-            className="bg-indigo-600 text-white hover:bg-indigo-500 font-bold py-4 px-2 rounded-2xl shadow-xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 text-xs disabled:opacity-50"
-          >
-            {isExporting ? <Loader2 size={20} className="animate-spin" /> : <Download size={20} />}
-            <span>Download PNG</span>
-          </button>
-
-          <button 
-            disabled={isExporting}
             onClick={handleDownloadPDF}
-            className="bg-indigo-600 text-white hover:bg-indigo-500 font-bold py-4 px-2 rounded-2xl shadow-xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 text-xs disabled:opacity-50"
+            disabled={isDownloading}
+            className="col-span-1 bg-white text-black font-bold py-3.5 rounded-xl shadow-xl hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            {isExporting ? <Loader2 size={20} className="animate-spin" /> : <FileText size={20} />}
-            <span>Download PDF</span>
+            {isDownloading ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+            <span>{isDownloading ? 'Saving...' : 'PDF'}</span>
           </button>
-
+          
           <button 
             onClick={onClose}
-            className="bg-slate-800 text-white hover:bg-slate-700 font-bold py-4 px-2 rounded-2xl shadow-xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 text-xs"
+            className="col-span-2 bg-[#141414] text-white font-bold py-4 rounded-xl shadow-xl hover:bg-black transition-all active:scale-95 flex items-center justify-center text-base"
           >
-            <X size={20} />
-            <span>Dismiss</span>
+            <span>Create New</span>
           </button>
         </div>
       </div>
