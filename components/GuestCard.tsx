@@ -66,23 +66,23 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
           ref={cardRef}
           className="guest-card-container bg-white rounded-[1.5rem] p-6 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.6)] text-slate-900 w-full aspect-[9/16] flex flex-col items-center overflow-hidden relative"
         >
-          {/* Top WiFi Icon Badge */}
+          {/* Top WiFi Icon Badge - Subtle & Small */}
           <div 
-            className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mb-6 mt-4 shadow-lg shrink-0"
+            className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center mb-4 mt-4 shrink-0"
             style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
           >
-            <Wifi size={24} className="text-white" />
+            <Wifi size={16} className="text-slate-400" />
           </div>
 
           {/* Centered Typography */}
-          <div className="text-center mb-6 shrink-0">
-            <h2 className="text-3xl font-bold text-slate-900 mb-1 tracking-tight">WiFi</h2>
+          <div className="text-center mb-4 shrink-0">
+            <h2 className="text-4xl font-black text-slate-900 mb-1 tracking-tighter font-outfit">WiFi</h2>
             <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Scan to connect</p>
           </div>
 
-          {/* Prominent QR Code - Centered in remaining space */}
-          <div className="w-full flex-grow flex items-center justify-center px-2 mb-6 min-h-0">
-            <div className="w-full max-w-[200px] aspect-square flex items-center justify-center p-4">
+          {/* Prominent QR Code - Significantly Larger */}
+          <div className="w-full flex-grow flex items-center justify-center px-0 mb-4 min-h-0">
+            <div className="w-full max-w-[260px] aspect-square flex items-center justify-center p-2">
               <img 
                 src={qrDataUrl} 
                 alt="WiFi QR Code" 
