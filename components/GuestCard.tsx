@@ -15,7 +15,19 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handlePrint = () => {
+    // Save original title
+    const originalTitle = document.title;
+    
+    // Create sanitized filename for PDF export via Print dialog
+    const safeSSID = config.ssid.replace(/[^a-z0-9\s\-_]/gi, '').trim();
+    document.title = `GuestPass Premium - ${safeSSID || 'Network'}`;
+    
     window.print();
+    
+    // Restore title after print dialog closes
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 500);
   };
 
   const handleDownloadPDF = async () => {
@@ -26,38 +38,34 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
       // Wait a moment for any layout shifts to settle
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      // Capture the card with optimized settings
+      // Capture the card with optimized settings to fix deployment issues
       const canvas = await html2canvas(cardRef.current, {
-        scale: 3, // Slightly reduced scale for better stability
+        scale: 3, // High resolution
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
         scrollX: 0,
         scrollY: 0,
-        // Critical: Handle styles that break html2canvas in the clone
         onclone: (clonedDoc) => {
           const element = clonedDoc.querySelector('.guest-card-container') as HTMLElement;
           const qrImage = clonedDoc.querySelector('.qr-code-img') as HTMLElement;
           
           if (element) {
-            // Remove shadows and animations which can cause clipping or offsets
+            // Remove styles that often break html2canvas in production
             element.style.boxShadow = 'none';
             element.style.animation = 'none';
             element.style.transform = 'none';
-            // Ensure flat white background
             element.style.background = '#ffffff'; 
           }
           
           if (qrImage) {
-            // Remove mix-blend-mode which html2canvas struggles with
+            // Fix blend mode issues by setting to normal for the capture
             qrImage.style.mixBlendMode = 'normal';
           }
         }
       });
 
-      // Use PNG for lossless quality
       const imgData = canvas.toDataURL('image/png');
-      
       const pdfWidth = 90; 
       const pdfHeight = 160; 
       
