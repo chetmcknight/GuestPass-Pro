@@ -8,6 +8,8 @@ import { Github, Printer, Wifi } from 'lucide-react';
 const App: React.FC = () => {
   const [result, setResult] = useState<QRResult | null>(null);
   const [loading, setLoading] = useState(false);
+  // Using a key allows us to force-reset the internal state of WifiForm
+  const [formKey, setFormKey] = useState(0);
 
   const handleGenerate = async (config: WifiConfig) => {
     setLoading(true);
@@ -33,6 +35,12 @@ const App: React.FC = () => {
     }
   };
 
+  const handleClose = () => {
+    setResult(null);
+    // Increment key to remount WifiForm, clearing its internal state (SSID/Password)
+    setFormKey(prev => prev + 1);
+  };
+
   return (
     <div className="relative min-h-screen selection:bg-[#ff3152]/30 bg-[#050505] overflow-hidden">
       {/* Premium Mesh Background */}
@@ -43,53 +51,57 @@ const App: React.FC = () => {
       </div>
 
       <div className="container mx-auto px-4 py-16 flex flex-col items-center relative z-10">
-        {/* Header */}
-        <header className="mb-16 text-center no-print">
-          <div className="flex items-center justify-center space-x-3 mb-6">
-            <h1 className="text-4xl md:text-7xl font-extrabold text-white font-outfit tracking-tighter drop-shadow-2xl">
-              GuestPass<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff3152] to-[#ff8c31]"> Premium</span>
-            </h1>
-          </div>
-          <p className="text-slate-400 max-w-lg mx-auto text-lg leading-relaxed font-medium">
-            Generate beautiful, scan-to-connect WiFi cards for your guests instantly.
-          </p>
-        </header>
+        {!result && (
+          <div className="w-full flex flex-col items-center animate-in fade-in duration-500">
+            {/* Header */}
+            <header className="mb-16 text-center no-print">
+              <div className="flex flex-col items-center justify-center mb-6">
+                <h1 className="text-4xl md:text-7xl font-extrabold text-white font-outfit drop-shadow-2xl">
+                  GuestPass<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff3152] to-[#ff8c31]"> Pro</span>
+                </h1>
+              </div>
+              <p className="text-slate-400 max-w-lg mx-auto text-lg leading-relaxed font-medium">
+                Generate beautiful, scan-to-connect WiFi cards <br className="hidden md:block" /> for your guests instantly.
+              </p>
+            </header>
 
-        {/* Main Form */}
-        <main className="w-full flex justify-center no-print">
-          <WifiForm onSubmit={handleGenerate} isLoading={loading} />
-        </main>
+            {/* Main Form */}
+            <main className="w-full flex justify-center no-print">
+              <WifiForm key={formKey} onSubmit={handleGenerate} isLoading={loading} />
+            </main>
 
-        {/* Features / Benefits */}
-        <section className="mt-28 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl no-print w-full px-4">
-          <div className="p-8 rounded-3xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all group backdrop-blur-sm">
-            <div className="w-12 h-12 rounded-2xl bg-[#ff3152]/10 flex items-center justify-center text-[#ff3152] mb-6 group-hover:scale-110 transition-transform shadow-[0_0_15px_-3px_rgba(255,49,82,0.3)]">
-              <Wifi size={24} />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-3 font-outfit">Instant Scan</h3>
-            <p className="text-slate-500 text-sm leading-relaxed">Join the network automatically. No manual typing required.</p>
-          </div>
-          <div className="p-8 rounded-3xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all group backdrop-blur-sm">
-            <div className="w-12 h-12 rounded-2xl bg-[#ff8c31]/10 flex items-center justify-center text-[#ff8c31] mb-6 group-hover:scale-110 transition-transform shadow-[0_0_15px_-3px_rgba(255,140,49,0.3)]">
-              <Printer size={24} />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-3 font-outfit">Print Ready</h3>
-            <p className="text-slate-500 text-sm leading-relaxed">Perfectly formatted for printing or saving as a high-quality PDF.</p>
-          </div>
-          <div className="p-8 rounded-3xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all group backdrop-blur-sm">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 mb-6 group-hover:scale-110 transition-transform shadow-[0_0_15px_-3px_rgba(99,102,241,0.3)]">
-              <Github size={24} />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-3 font-outfit">Fast & Secure</h3>
-            <p className="text-slate-500 text-sm leading-relaxed">Optimized local processing ensures your card is ready in milliseconds.</p>
-          </div>
-        </section>
+            {/* Features / Benefits */}
+            <section className="mt-28 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl no-print w-full px-4">
+              <div className="p-8 rounded-3xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all group backdrop-blur-sm">
+                <div className="w-12 h-12 rounded-2xl bg-[#ff3152]/10 flex items-center justify-center text-[#ff3152] mb-6 group-hover:scale-110 transition-transform shadow-[0_0_15px_-3px_rgba(255,49,82,0.3)]">
+                  <Wifi size={24} />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3 font-outfit">Instant Scan</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">Join the network automatically. No manual typing required.</p>
+              </div>
+              <div className="p-8 rounded-3xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all group backdrop-blur-sm">
+                <div className="w-12 h-12 rounded-2xl bg-[#ff8c31]/10 flex items-center justify-center text-[#ff8c31] mb-6 group-hover:scale-110 transition-transform shadow-[0_0_15px_-3px_rgba(255,140,49,0.3)]">
+                  <Printer size={24} />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3 font-outfit">Print Ready</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">Perfectly formatted for printing or saving as a high-quality PDF.</p>
+              </div>
+              <div className="p-8 rounded-3xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all group backdrop-blur-sm">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 mb-6 group-hover:scale-110 transition-transform shadow-[0_0_15px_-3px_rgba(99,102,241,0.3)]">
+                  <Github size={24} />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3 font-outfit">Fast & Secure</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">Optimized local processing ensures your card is ready in milliseconds.</p>
+              </div>
+            </section>
 
-        <footer className="mt-32 text-center text-slate-600 text-sm no-print">
-          <p>© 2026 GuestPass Premium</p>
-        </footer>
+            <footer className="mt-32 text-center text-slate-600 text-sm no-print">
+              <p>© 2026 GuestPass Pro</p>
+            </footer>
+          </div>
+        )}
 
-        {result && <GuestCard result={result} onClose={() => setResult(null)} />}
+        {result && <GuestCard result={result} onClose={handleClose} />}
       </div>
     </div>
   );

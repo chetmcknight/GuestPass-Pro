@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Wifi, Lock, Eye, EyeOff, ShieldCheck, Sparkles, Loader2, ArrowRight } from 'lucide-react';
+import { Wifi, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
 import { WifiConfig, SecurityType } from '../types';
 
 interface WifiFormProps {
@@ -32,19 +31,19 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
         <Wifi size={24} />
       </div>
 
-      <div className="space-y-1 mb-10">
+      <div className="mb-10">
         <h2 className="text-3xl font-bold text-white font-outfit tracking-tight">
-          GuestPass<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff3152] to-[#ff8c31]"> Premium</span>
+          GuestPass<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff3152] to-[#ff8c31]"> Pro</span>
         </h2>
-        <p className="text-slate-500 text-sm font-medium">New network setup</p>
       </div>
 
       <div className="space-y-8">
         {/* SSID Input */}
         <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Network Name</label>
+          <label htmlFor="ssid-input" className="text-sm font-bold text-slate-500 tracking-normal block ml-1">Network Name</label>
           <div className="relative">
             <input
+              id="ssid-input"
               required
               type="text"
               placeholder="e.g. MySuperFastWiFi"
@@ -57,12 +56,14 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
 
         {/* Password Input */}
         <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Password</label>
+          <label htmlFor="password-input" className="text-sm font-bold text-slate-500 tracking-normal block ml-1">Password</label>
           <div className="relative group">
             <input
+              id="password-input"
               required={config.security !== 'nopass'}
               disabled={config.security === 'nopass'}
               type={showPassword ? "text" : "password"}
+              autoComplete="new-password"
               placeholder="••••••••"
               className="w-full bg-[#1a1a1a] border-none rounded-2xl py-4 px-6 text-white placeholder-slate-700 focus:outline-none focus:ring-1 focus:ring-[#ff3152]/30 transition-all font-medium disabled:opacity-30"
               value={config.password}
@@ -100,12 +101,13 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
           </div>
         </button>
 
-        {/* Custom Security and Signal Footer */}
+        {/* Custom Security Footer */}
         <div className="pt-8 border-t border-white/5 flex items-end justify-between">
           <div className="space-y-1">
-            <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest block">Security</span>
+            <label htmlFor="security-select" className="text-sm font-bold text-slate-500 tracking-normal block ml-1">Security</label>
             <select
-              className="bg-transparent border-none text-white font-bold p-0 focus:ring-0 cursor-pointer appearance-none hover:text-[#ff3152] transition-colors"
+              id="security-select"
+              className="bg-transparent border-none text-white font-bold p-0 focus:ring-0 cursor-pointer appearance-none hover:text-[#ff3152] transition-colors ml-1"
               value={config.security}
               onChange={(e) => setConfig({ ...config, security: e.target.value as SecurityType })}
             >
@@ -113,14 +115,6 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
               <option value="WEP" className="bg-[#111111]">WEP</option>
               <option value="nopass" className="bg-[#111111]">Open</option>
             </select>
-          </div>
-
-          {/* Visual Signal Bars */}
-          <div className="flex items-end gap-1 mb-1">
-            <div className="w-1.5 h-3 bg-slate-800 rounded-sm"></div>
-            <div className="w-1.5 h-4 bg-slate-800 rounded-sm"></div>
-            <div className="w-1.5 h-6 bg-[#ff3152] rounded-sm shadow-[0_0_8px_#ff3152]"></div>
-            <div className="w-1.5 h-4 bg-slate-800 rounded-sm"></div>
           </div>
         </div>
       </div>

@@ -1,5 +1,4 @@
-
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 
 export const generateAIWelcome = async (ssid: string): Promise<string> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });

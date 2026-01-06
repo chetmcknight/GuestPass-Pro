@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GuestPass Premium - WiFi Guest Card Generator</title>
+    <title>GuestPass Pro - WiFi Guest Card Generator</title>
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23ff5f3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/></svg>'>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,62 +14,80 @@
             font-family: 'Inter', sans-serif;
             background: #0a0a0a;
             min-height: 100vh;
+            scroll-behavior: smooth;
         }
         h1, h2, h3, .font-outfit {
             font-family: 'Outfit', sans-serif;
         }
         @media print {
             @page {
+                margin: 0;
                 size: auto;
-                margin: 0mm;
-            }
-            body { 
-                visibility: hidden;
-                background: white;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
             }
             
-            /* Make the overlay visible and cover the page */
+            html, body {
+                background-color: #ffffff;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+            }
+
+            /* Use visibility to hide non-print elements while keeping structure for the portal */
+            body * {
+                visibility: hidden;
+            }
+
+            /* The overlay wrapper */
             .guest-card-overlay {
                 visibility: visible !important;
                 position: fixed !important;
                 top: 0 !important;
                 left: 0 !important;
-                right: 0 !important;
-                bottom: 0 !important;
-                background: white !important;
+                width: 100% !important;
+                height: 100% !important;
+                background-color: #ffffff !important;
+                z-index: 999999 !important;
+                
+                /* Center content */
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                z-index: 99999 !important;
+                
+                /* Reset standard box model stuff */
                 margin: 0 !important;
                 padding: 0 !important;
-                height: 100vh !important;
-                width: 100vw !important;
             }
             
-            /* Make sure all children of the overlay are visible */
+            /* Ensure all children of the overlay are visible */
             .guest-card-overlay * {
                 visibility: visible !important;
             }
 
+            /* The specific card container */
             .guest-card-container {
-                box-shadow: none !important;
+                width: 127mm !important; /* 5 inches */
+                height: 178mm !important; /* 7 inches */
+                
+                /* Visual borders for print */
                 border: 1px solid #e2e8f0 !important;
-                /* 9:16 aspect ratio. e.g. 90mm x 160mm */
-                width: 90mm !important;
-                height: 160mm !important;
-                margin: auto !important;
-                transform: none !important;
-                display: flex !important;
-                /* Reset positioning that might interfere with print flow */
-                position: relative !important; 
-                left: auto !important;
-                top: auto !important;
+                border-radius: 0 !important;
+                
+                /* Reset positioning/spacing */
+                margin: 0 !important;
+                box-shadow: none !important;
+                position: relative !important;
+                
+                /* Ensure background colors print */
+                background-color: #ffffff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
 
-            .no-print { display: none !important; }
+            /* Hide elements explicitly marked as no-print */
+            .no-print {
+                display: none !important;
+            }
         }
     </style>
 <script type="importmap">
