@@ -7,6 +7,8 @@ export interface WifiConfig {
   security: SecurityType;
   hidden: boolean;
   welcomeMessage?: string;
+  hideSsidOnCard?: boolean;
+  hidePasswordOnCard?: boolean;
 }
 
 export interface QRResult {

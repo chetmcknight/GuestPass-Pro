@@ -61,12 +61,14 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
           {/* Footer Section: Details - Label: Value Format - Left Aligned */}
           <div className="w-full shrink-0 mb-1 mt-auto">
             <div className="w-full flex flex-col items-start gap-1">
-              <div className="flex flex-wrap items-baseline justify-start gap-x-2 w-full text-left">
-                <span className="text-sm font-medium text-slate-400">Network Name:</span>
-                <span className="text-lg font-medium font-outfit text-slate-900 break-all leading-tight">{config.ssid}</span>
-              </div>
+              {!config.hideSsidOnCard && (
+                <div className="flex flex-wrap items-baseline justify-start gap-x-2 w-full text-left">
+                  <span className="text-sm font-medium text-slate-400">Network Name:</span>
+                  <span className="text-lg font-medium font-outfit text-slate-900 break-all leading-tight">{config.ssid}</span>
+                </div>
+              )}
 
-              {config.security !== 'nopass' && config.password && (
+              {config.security !== 'nopass' && config.password && !config.hidePasswordOnCard && (
                 <div className="flex flex-wrap items-baseline justify-start gap-x-2 w-full text-left">
                   <span className="text-sm font-medium text-slate-400">Password:</span>
                   <span className="text-lg font-medium font-outfit text-slate-900 break-all leading-tight">{config.password}</span>

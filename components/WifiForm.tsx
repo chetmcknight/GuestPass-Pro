@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wifi, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
+import { Wifi, Eye, EyeOff, Loader2, ArrowRight, ShieldCheck, Type } from 'lucide-react';
 import { WifiConfig, SecurityType } from '../types';
 
 interface WifiFormProps {
@@ -13,12 +13,18 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
     password: '',
     security: 'WPA',
     hidden: false,
+    hideSsidOnCard: false,
+    hidePasswordOnCard: false,
   });
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(config);
+  };
+
+  const toggleOption = (key: 'hideSsidOnCard' | 'hidePasswordOnCard') => {
+    setConfig(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
   return (
@@ -37,7 +43,7 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
         </h2>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* SSID Input */}
         <div className="space-y-2">
           <label htmlFor="ssid-input" className="text-sm font-bold text-slate-500 tracking-normal block ml-1">Network Name</label>
@@ -81,6 +87,28 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
           </div>
         </div>
 
+        {/* Card Customization Options */}
+        <div className="grid grid-cols-2 gap-4 py-2">
+           <button
+             type="button"
+             onClick={() => toggleOption('hideSsidOnCard')}
+             className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition-all ${config.hideSsidOnCard ? 'border-[#ff3152] bg-[#ff3152]/5 text-white' : 'border-white/5 bg-white/0 text-slate-500 hover:bg-white/5 hover:text-slate-300'}`}
+           >
+             <Type size={18} className="mb-1" />
+             <span className="text-[10px] font-bold uppercase tracking-wider">{config.hideSsidOnCard ? 'Name Hidden' : 'Show Name'}</span>
+           </button>
+
+           <button
+             type="button"
+             disabled={config.security === 'nopass'}
+             onClick={() => toggleOption('hidePasswordOnCard')}
+             className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition-all disabled:opacity-20 ${config.hidePasswordOnCard ? 'border-[#ff3152] bg-[#ff3152]/5 text-white' : 'border-white/5 bg-white/0 text-slate-500 hover:bg-white/5 hover:text-slate-300'}`}
+           >
+             <ShieldCheck size={18} className="mb-1" />
+             <span className="text-[10px] font-bold uppercase tracking-wider">{config.hidePasswordOnCard ? 'Pass Hidden' : 'Show Pass'}</span>
+           </button>
+        </div>
+
         <button
           disabled={isLoading || !config.ssid}
           type="submit"
@@ -102,7 +130,7 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
         </button>
 
         {/* Custom Security Footer */}
-        <div className="pt-8 border-t border-white/5 flex items-end justify-between">
+        <div className="pt-6 border-t border-white/5 flex items-end justify-between">
           <div className="space-y-1">
             <label htmlFor="security-select" className="text-sm font-bold text-slate-500 tracking-normal block ml-1">Security</label>
             <select
