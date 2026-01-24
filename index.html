@@ -5,10 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GuestPass Pro - WiFi Guest Card Generator</title>
     <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23ff5f3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/></svg>'>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Critical Resource Preloading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;800&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- ESM Preloading for Speed -->
+    <link rel="modulepreload" href="https://esm.sh/react@^19.2.3">
+    <link rel="modulepreload" href="https://esm.sh/react-dom@^19.2.3">
+    <link rel="modulepreload" href="https://esm.sh/lucide-react@^0.562.0">
+    <link rel="modulepreload" href="https://esm.sh/qrcode@^1.5.4">
+
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -33,12 +43,10 @@
                 height: 100%;
             }
 
-            /* Use visibility to hide non-print elements while keeping structure for the portal */
             body * {
                 visibility: hidden;
             }
 
-            /* The overlay wrapper */
             .guest-card-overlay {
                 visibility: visible !important;
                 position: fixed !important;
@@ -48,43 +56,30 @@
                 height: 100% !important;
                 background-color: #ffffff !important;
                 z-index: 999999 !important;
-                
-                /* Center content */
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                
-                /* Reset standard box model stuff */
                 margin: 0 !important;
                 padding: 0 !important;
             }
             
-            /* Ensure all children of the overlay are visible */
             .guest-card-overlay * {
                 visibility: visible !important;
             }
 
-            /* The specific card container */
             .guest-card-container {
-                width: 127mm !important; /* 5 inches */
-                height: 178mm !important; /* 7 inches */
-                
-                /* Visual borders for print */
+                width: 127mm !important;
+                height: 178mm !important;
                 border: 1px solid #e2e8f0 !important;
                 border-radius: 0 !important;
-                
-                /* Reset positioning/spacing */
                 margin: 0 !important;
                 box-shadow: none !important;
                 position: relative !important;
-                
-                /* Ensure background colors print */
                 background-color: #ffffff !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
 
-            /* Hide elements explicitly marked as no-print */
             .no-print {
                 display: none !important;
             }
@@ -98,9 +93,7 @@
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "react": "https://esm.sh/react@^19.2.3",
     "react/": "https://esm.sh/react@^19.2.3/",
-    "qrcode": "https://esm.sh/qrcode@^1.5.4",
-    "html2canvas": "https://esm.sh/html2canvas@1.4.1",
-    "jspdf": "https://esm.sh/jspdf@2.5.1"
+    "qrcode": "https://esm.sh/qrcode@^1.5.4"
   }
 }
 </script>

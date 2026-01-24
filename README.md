@@ -1,20 +1,38 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# GuestPass Pro 🚀
 
-# Run and deploy your AI Studio app
+An elegant WiFi QR Code generator that creates high-quality, print-ready guest cards with AI-powered welcome messages.
 
-This contains everything you need to run your app locally.
+## ✨ Features
 
-View your app in AI Studio: https://ai.studio/apps/drive/1aLuucIeYz-Ixh1vYHath6QmnmfFrAKzS
+- **Instant Connectivity**: Generates standard `WIFI:S:...` URI schemes compatible with iOS and Android.
+- **AI-Enhanced Hospitality**: Uses Google Gemini 3 Flash to craft unique, warm welcome messages for your guests.
+- **Privacy-First**: Options to hide SSID or Password on the physical card for added security.
+- **Premium Aesthetics**: High-end UI featuring mesh gradients, glassmorphism, and smooth transitions.
+- **Print Optimized**: Automatically formats cards to a standard 5x7 portrait aspect ratio for professional printing.
 
-## Run Locally
+## 🛠️ Tech Stack
 
-**Prerequisites:**  Node.js
+- **Framework**: [React 19](https://react.dev/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **AI Intelligence**: [Google Gemini API](https://ai.google.dev/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **QR Engine**: [QRCode.js](https://github.com/soldair/node-qrcode)
 
+## 🚀 Getting Started
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### Environment Variables
+
+The app requires a Google Gemini API key to generate welcome messages.
+
+```env
+API_KEY=your_gemini_api_key_here
+```
+
+### Installation
+
+1. Clone the repository.
+2. Serve the `index.html` file using a local web server (ES modules required).
+
+## 📄 License
+
+MIT License - feel free to use and modify for your personal or commercial projects.
