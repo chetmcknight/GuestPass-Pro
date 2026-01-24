@@ -34,13 +34,15 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
     setConfig(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const inputClasses = "w-full bg-[#1a1a1a] border border-transparent rounded-2xl py-3.5 px-5 text-white placeholder-slate-700 hover:border-[#ff8c31]/30 focus:outline-none focus:ring-2 focus:ring-[#ff8c31]/50 focus:border-transparent transition-all duration-300 font-medium text-sm";
+  // text-base (16px) is critical for iOS to prevent auto-zoom on focus
+  const inputClasses = "w-full bg-[#1a1a1a] border border-transparent rounded-2xl py-3.5 px-5 text-white placeholder-slate-700 hover:border-[#ff8c31]/30 focus:outline-none focus:ring-2 focus:ring-[#ff8c31]/50 focus:border-transparent transition-all duration-300 font-medium text-base md:text-sm";
   const labelClasses = "text-[11px] font-bold text-slate-500 tracking-wider uppercase block ml-1 mb-1.5";
 
   return (
     <form 
       onSubmit={handleSubmit}
-      className="bg-[#111111] border border-white/5 rounded-[2.5rem] p-8 md:p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] w-full max-w-2xl mx-auto relative overflow-hidden backdrop-blur-sm"
+      style={{ contain: 'content' }}
+      className="bg-[#111111] border border-white/5 rounded-[2.5rem] p-6 md:p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] w-full max-w-2xl mx-auto relative overflow-hidden backdrop-blur-sm"
     >
       <div className="absolute top-10 right-10 w-12 h-12 bg-gradient-to-br from-[#ff5f3d] to-[#ff3152] rounded-full flex items-center justify-center text-white shadow-[0_0_25px_rgba(255,49,82,0.4)] hidden md:flex">
         <Wifi size={24} />
@@ -53,7 +55,7 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
         <p className="text-slate-500 text-sm mt-1">Configure your network and business profile.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
         <div className="space-y-6">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-1 h-4 bg-[#ff3152] rounded-full"></div>
@@ -200,6 +202,7 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
                 <Globe size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" />
                 <input
                   type="text"
+                  inputMode="url"
                   placeholder="acme.com"
                   className={`${inputClasses} pl-12`}
                   value={config.companyWebsite}
@@ -229,6 +232,7 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
                   <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" />
                   <input
                     type="tel"
+                    inputMode="tel"
                     placeholder="+1 (555) 000-0000"
                     className={`${inputClasses} pl-12`}
                     value={config.contactPhone}
@@ -243,6 +247,7 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
                   <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" />
                   <input
                     type="text"
+                    inputMode="email"
                     placeholder="hi@acme.com"
                     className={`${inputClasses} pl-12`}
                     value={config.contactEmail}

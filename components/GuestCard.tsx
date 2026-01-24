@@ -19,11 +19,11 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 guest-card-overlay overflow-y-auto animate-in fade-in zoom-in-95 duration-300 print:animate-none print:p-0 print:overflow-visible">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 guest-card-overlay overflow-y-auto animate-in fade-in zoom-in-95 duration-300 print:animate-none print:p-0 print:overflow-visible" style={{ willChange: 'transform, opacity' }}>
       <div className="relative w-full max-w-[340px] my-auto flex flex-col items-center print:w-auto print:max-w-none print:my-0">
         
         {/* The Card Component - Precise 5:7 Portrait Layout */}
-        <div className="guest-card-container bg-white rounded-[1.25rem] p-8 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.6)] text-slate-900 w-full aspect-[5/7] flex flex-col items-center justify-between overflow-hidden relative">
+        <div className="guest-card-container bg-white rounded-[1.25rem] p-8 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.6)] text-slate-900 w-full aspect-[5/7] flex flex-col items-center justify-between overflow-hidden relative" style={{ backfaceVisibility: 'hidden' }}>
           
           {/* Header */}
           <div className="flex flex-col items-center w-full shrink-0 pt-6">
