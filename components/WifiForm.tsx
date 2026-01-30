@@ -1,5 +1,5 @@
-import React, { useState, memo } from 'react';
-import { Wifi, Eye, EyeOff, Loader2, ArrowRight, ShieldCheck, Type, Building2, User, Phone, Mail, MapPin, Globe, StickyNote } from 'lucide-react';
+import React, { useState, memo, useEffect, useRef, useMemo } from 'react';
+import { Wifi, Eye, EyeOff, Loader2, ArrowRight, ShieldCheck, Type, Building2, User, Phone, Mail, MapPin, Globe, StickyNote, History, Radio, Info, Search } from 'lucide-react';
 import { WifiConfig, SecurityType } from '../types';
 
 interface WifiFormProps {
@@ -23,10 +23,63 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
     contactEmail: '',
     notes: ''
   });
+  
   const [showPassword, setShowPassword] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [recentNetworks, setRecentNetworks] = useState<{ssid: string, security: SecurityType}[]>([]);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Persistence: Load history from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('guestpass_history');
+    if (saved) {
+      try {
+        setRecentNetworks(JSON.parse(saved).slice(0, 5));
+      } catch (e) {
+        console.error("Failed to load history");
+      }
+    }
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleScan = () => {
+    setIsScanning(true);
+    setShowDropdown(false);
+    // Simulate network discovery delay to provide a "premium/high-tech" feel
+    // Browser APIs do not permit actual SSID scanning for privacy reasons
+    setTimeout(() => {
+      setIsScanning(false);
+      setShowDropdown(true);
+    }, 1200);
+  };
+
+  const selectNetwork = (ssid: string, security?: SecurityType) => {
+    setConfig(prev => ({ 
+      ...prev, 
+      ssid, 
+      security: security || prev.security 
+    }));
+    setShowDropdown(false);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Update local history
+    const history = [{ ssid: config.ssid, security: config.security }, ...recentNetworks]
+      .filter((v, i, a) => a.findIndex(t => t.ssid === v.ssid) === i)
+      .slice(0, 10);
+    localStorage.setItem('guestpass_history', JSON.stringify(history));
+    setRecentNetworks(history.slice(0, 5));
+
     onSubmit(config);
   };
 
@@ -34,9 +87,9 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
     setConfig(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // text-base (16px) is critical for iOS to prevent auto-zoom on focus
-  const inputClasses = "w-full bg-[#1a1a1a] border border-transparent rounded-2xl py-3.5 px-5 text-white placeholder-slate-700 hover:border-[#ff8c31]/30 focus:outline-none focus:ring-2 focus:ring-[#ff8c31]/50 focus:border-transparent transition-all duration-300 font-medium text-base md:text-sm";
-  const labelClasses = "text-[11px] font-bold text-slate-500 tracking-wider uppercase block ml-1 mb-1.5";
+  // Memoized class sets for slight performance gain in re-renders
+  const inputClasses = useMemo(() => "w-full bg-[#1a1a1a] border border-transparent rounded-2xl py-3.5 px-5 text-white placeholder-slate-700 hover:border-[#ff8c31]/30 focus:outline-none focus:ring-2 focus:ring-[#ff8c31]/50 focus:border-transparent transition-all duration-300 font-medium text-base md:text-sm", []);
+  const labelClasses = useMemo(() => "text-[11px] font-bold text-slate-500 tracking-wider uppercase block ml-1 mb-1.5", []);
 
   return (
     <form 
@@ -45,7 +98,7 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
       className="bg-[#111111] border border-white/5 rounded-[2.5rem] p-6 md:p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] w-full max-w-2xl mx-auto relative overflow-hidden backdrop-blur-sm"
     >
       <div className="absolute top-10 right-10 w-12 h-12 bg-gradient-to-br from-[#ff5f3d] to-[#ff3152] rounded-full flex items-center justify-center text-white shadow-[0_0_25px_rgba(255,49,82,0.4)] hidden md:flex">
-        <Wifi size={24} />
+        <Wifi size={24} className={isScanning ? "animate-pulse" : ""} />
       </div>
 
       <div className="mb-10">
@@ -57,23 +110,112 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
         <div className="space-y-6">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-1 h-4 bg-[#ff3152] rounded-full"></div>
-            <h3 className="text-xs font-black text-white uppercase tracking-[0.2em]">Network</h3>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-4 bg-[#ff3152] rounded-full"></div>
+              <h3 className="text-xs font-black text-white uppercase tracking-[0.2em]">Network</h3>
+            </div>
+            <button 
+              type="button"
+              onClick={handleScan}
+              disabled={isScanning}
+              className="text-[10px] font-bold text-[#ff8c31] uppercase tracking-wider flex items-center gap-1.5 hover:opacity-80 transition-opacity disabled:opacity-50"
+            >
+              {isScanning ? (
+                <>
+                  <Loader2 size={12} className="animate-spin" />
+                  <span>Scanning...</span>
+                </>
+              ) : (
+                <>
+                  <Search size={12} />
+                  <span>Scan Nearby</span>
+                </>
+              )}
+            </button>
           </div>
 
           <div className="space-y-4">
-            <div>
+            <div className="relative" ref={dropdownRef}>
               <label className={labelClasses}>Network Name (SSID)</label>
-              <div className="relative">
+              <div className="relative group">
                 <input
                   required
                   type="text"
-                  placeholder="Office_Guest"
+                  placeholder="e.g. Office_Guest"
                   className={inputClasses}
                   value={config.ssid}
+                  autoComplete="off"
+                  onFocus={() => setShowDropdown(true)}
                   onChange={(e) => setConfig({ ...config, ssid: e.target.value })}
                 />
+                
+                {/* Custom Smart Dropdown */}
+                {showDropdown && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden z-50 shadow-2xl backdrop-blur-xl animate-in slide-in-from-top-2 duration-200">
+                    <div className="p-2 max-h-64 overflow-y-auto custom-scrollbar">
+                      <div className="px-3 py-2 mb-1 flex items-start gap-2 bg-white/[0.03] rounded-xl">
+                        <Info size={14} className="text-slate-500 shrink-0 mt-0.5" />
+                        <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
+                          Browser security restricts direct WiFi scanning. Use history or common patterns below.
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => selectNetwork("Public Connection")}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors text-left group/item"
+                      >
+                        <Radio size={16} className="text-emerald-500" />
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-white group-hover/item:text-[#ff8c31]">Simulated Hotspot</span>
+                          <span className="text-[10px] text-slate-500 uppercase font-black">Ready to connect</span>
+                        </div>
+                      </button>
+
+                      {recentNetworks.length > 0 && (
+                        <>
+                          <div className="px-3 pt-3 pb-1 border-t border-white/5 mt-1">
+                            <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Recent History</span>
+                          </div>
+                          {recentNetworks.map((net, i) => (
+                            <button
+                              key={i}
+                              type="button"
+                              onClick={() => selectNetwork(net.ssid, net.security)}
+                              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors text-left group/item"
+                            >
+                              <History size={16} className="text-slate-600" />
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium text-white group-hover/item:text-[#ff8c31]">{net.ssid}</span>
+                                <span className="text-[9px] text-slate-600 uppercase font-bold">{net.security}</span>
+                              </div>
+                            </button>
+                          ))}
+                        </>
+                      )}
+                      
+                      {recentNetworks.length === 0 && (
+                        <>
+                          <div className="px-3 pt-3 pb-1 border-t border-white/5 mt-1">
+                            <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Common Names</span>
+                          </div>
+                          {["Guest_WiFi", "Office_Network", "Customer_5G"].map((name) => (
+                            <button
+                              key={name}
+                              type="button"
+                              onClick={() => selectNetwork(name)}
+                              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors text-left"
+                            >
+                              <Wifi size={16} className="text-slate-600" />
+                              <span className="text-sm font-medium text-white">{name}</span>
+                            </button>
+                          ))}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
