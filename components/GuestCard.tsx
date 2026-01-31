@@ -39,8 +39,7 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
 
           {/* QR Code Section - Optically Centered with negative margin to offset header weight */}
           <div className="flex-grow w-full flex items-center justify-center min-h-0 relative -translate-y-3 z-0 print:translate-y-0">
-            <div className="w-full h-full max-w-[200px] max-h-[200px] aspect-square flex items-center justify-center p-3 bg-white border-2 border-slate-100 rounded-[2rem] print:border-slate-200 shadow-sm relative group">
-              <div className="absolute inset-0 rounded-[2rem] border border-slate-900/5 pointer-events-none"></div>
+            <div className="w-full h-full max-w-[200px] max-h-[200px] aspect-square flex items-center justify-center relative">
               <img 
                 src={qrDataUrl} 
                 alt="WiFi QR Code" 
