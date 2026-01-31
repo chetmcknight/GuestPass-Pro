@@ -13,7 +13,7 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
   const handlePrint = () => {
     const originalTitle = document.title;
     const safeSSID = config.ssid.replace(/[^a-z0-9\s\-_]/gi, '').trim();
-    document.title = `GuestPass Pro - ${safeSSID || 'Network'}`;
+    document.title = `GuestPassPro - ${safeSSID || 'Network'}`;
     window.print();
     setTimeout(() => { document.title = originalTitle; }, 500);
   };
@@ -23,22 +23,24 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
       <div className="relative w-full max-w-[340px] my-auto flex flex-col items-center print:w-auto print:max-w-none print:my-0">
         
         {/* The Card Component - Precise 5:7 Portrait Layout */}
-        <div className="guest-card-container bg-white rounded-[1.25rem] p-8 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.6)] text-slate-900 w-full aspect-[5/7] flex flex-col items-center justify-between overflow-hidden relative" style={{ backfaceVisibility: 'hidden' }}>
+        <div className="guest-card-container bg-white rounded-[1.25rem] px-8 pt-10 pb-4 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.6)] text-slate-900 w-full aspect-[5/7] flex flex-col items-center justify-between overflow-hidden relative" style={{ backfaceVisibility: 'hidden' }}>
           
-          {/* Header */}
-          <div className="flex flex-col items-center w-full shrink-0 pt-6">
-            <div className="w-14 h-14 bg-slate-100 rounded-full flex items-center justify-center mb-4 border border-slate-200 print:border-slate-900">
+          {/* Header Section */}
+          <div className="flex flex-col items-center w-full shrink-0 z-10">
+            <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100 rotate-3 print:border-slate-200 shadow-sm transition-transform hover:rotate-6 duration-500">
               <Wifi size={24} className="text-slate-900" strokeWidth={2.5} />
             </div>
-            <div className="text-center px-4">
-              <h2 className="text-3xl font-bold text-slate-900 tracking-tighter font-outfit leading-none mb-3">WiFi</h2>
-              <p className="text-slate-400 font-medium text-xl">Scan to Connect</p>
+            
+            <div className="text-center px-4 space-y-0.5">
+              <h2 className="text-3xl font-bold text-slate-900 tracking-tight font-outfit leading-none">Connect to WiFi</h2>
+              <p className="text-slate-400 font-medium text-xs tracking-wide">Scan code to join network</p>
             </div>
           </div>
 
-          {/* QR Code Section - No box/border */}
-          <div className="flex-grow w-full flex items-center justify-center py-4 min-h-0 print:bg-white">
-            <div className="w-full h-full max-w-[220px] max-h-[220px] aspect-square flex items-center justify-center">
+          {/* QR Code Section - Optically Centered with negative margin to offset header weight */}
+          <div className="flex-grow w-full flex items-center justify-center min-h-0 relative -translate-y-3 z-0 print:translate-y-0">
+            <div className="w-full h-full max-w-[200px] max-h-[200px] aspect-square flex items-center justify-center p-3 bg-white border-2 border-slate-100 rounded-[2rem] print:border-slate-200 shadow-sm relative group">
+              <div className="absolute inset-0 rounded-[2rem] border border-slate-900/5 pointer-events-none"></div>
               <img 
                 src={qrDataUrl} 
                 alt="WiFi QR Code" 
@@ -48,31 +50,20 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
             </div>
           </div>
 
-          {/* Footer Branding & Details */}
-          <div className="w-full shrink-0 mb-2 mt-auto">
-            <div className="w-full flex flex-col items-start gap-2 bg-slate-50 p-4 rounded-xl border border-slate-100">
-              {!config.hideSsidOnCard && (
-                <div className="flex flex-col items-start w-full text-left">
-                  <span className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-0.5">Network Name</span>
-                  <span className="text-base font-bold font-outfit text-slate-900 break-all leading-tight">{config.ssid}</span>
-                </div>
-              )}
-              {config.security !== 'nopass' && config.password && !config.hidePasswordOnCard && (
-                <div className="flex flex-col items-start w-full text-left">
-                  <span className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-0.5">Password</span>
-                  <span className="text-base font-bold font-outfit text-slate-900 break-all leading-tight">{config.password}</span>
-                </div>
-              )}
-            </div>
+          {/* Footer Branding */}
+          <div className="w-full shrink-0 mt-auto flex flex-col items-center gap-2 z-10">
+            {config.companyName && (
+               <div className="relative mb-0.5">
+                 <p className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] text-center relative z-10">
+                   {config.companyName}
+                 </p>
+                 <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1/2 h-[1px] bg-[#ff8c31]/30 rounded-full"></div>
+               </div>
+            )}
             
-            <div className="pt-6 flex flex-col items-center gap-1">
-              {config.companyName && (
-                <p className="text-[11px] text-slate-900 font-black uppercase tracking-[0.4em] mb-1">
-                  {config.companyName}
-                </p>
-              )}
-              <p className="text-[8px] text-slate-300 font-bold uppercase tracking-[0.3em]">GuestPass Pro</p>
-            </div>
+            <p className="text-[8px] font-bold text-slate-300 tracking-widest select-none">
+              GuestCardPro
+            </p>
           </div>
         </div>
 

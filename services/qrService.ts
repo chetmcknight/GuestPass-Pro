@@ -1,4 +1,4 @@
-import QRCode from 'qrcode';
+import qrcode from 'qrcode-generator';
 import { WifiConfig } from '../types';
 
 /**
@@ -30,16 +30,19 @@ export const generateWifiString = (config: WifiConfig): string => {
 export const generateQRCode = async (config: WifiConfig): Promise<string> => {
   const wifiString = generateWifiString(config);
   try {
-    const dataUrl = await QRCode.toDataURL(wifiString, {
-      width: 1024, // Optimized for high-quality printing
-      margin: 1,   // Minimal margin to maximize QR size
-      color: {
-        dark: '#000000',
-        light: '#ffffff',
-      },
-      errorCorrectionLevel: 'M',
-    });
-    return dataUrl;
+    // 0 = Auto type detection, 'M' = Medium error correction
+    const qr = qrcode(0, 'M');
+    qr.addData(wifiString);
+    qr.make();
+
+    // Calculate module size to get approximately 1024px image
+    // This ensures high print quality
+    const moduleCount = qr.getModuleCount();
+    const cellSize = Math.max(Math.floor(1024 / moduleCount), 2);
+    const margin = 0; // Margin handled by CSS container
+
+    // Returns a base64 GIF image string
+    return qr.createDataURL(cellSize, margin);
   } catch (err) {
     console.error('QR Generation Error:', err);
     throw err;

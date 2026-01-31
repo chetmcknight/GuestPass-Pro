@@ -3,7 +3,6 @@ import WifiForm from './components/WifiForm';
 import GuestCard from './components/GuestCard';
 import { WifiConfig, QRResult } from './types';
 import { generateQRCode } from './services/qrService';
-import { Sparkles } from 'lucide-react';
 
 // LATEST DEPLOYED URL
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwfVab6ULGhbQLTL2YBvx7rlNXlhPJk8FnQzEzGYS_3S0G2tU4Cu97zj9fCRtdGQnncwg/exec'; 
@@ -11,6 +10,7 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwfVab6ULGhbQ
 const App: React.FC = () => {
   const [result, setResult] = useState<QRResult | null>(null);
   const [formKey, setFormKey] = useState(0);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const submitToGoogleSheets = useCallback(async (config: WifiConfig) => {
     if (!GOOGLE_SCRIPT_URL) return;
@@ -45,6 +45,7 @@ const App: React.FC = () => {
   }, []);
 
   const handleGenerate = async (config: WifiConfig) => {
+    setIsGenerating(true);
     try {
       const qrDataUrl = await generateQRCode(config);
       
@@ -58,6 +59,8 @@ const App: React.FC = () => {
       submitToGoogleSheets(config);
     } catch (error) {
       console.error("Failed to generate guest card", error);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -74,24 +77,11 @@ const App: React.FC = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(5,5,5,0.9)_100%)]" />
       </div>
 
-      <div className="container mx-auto px-4 py-20 flex flex-col items-center relative z-10">
+      <div className="container mx-auto px-4 py-12 md:py-24 flex flex-col items-center relative z-10">
         {!result && (
           <div className="w-full flex flex-col items-center">
-            <header className="mb-12 text-center no-print">
-              <div className="flex flex-col items-center justify-center">
-                <h1 className="text-5xl md:text-8xl font-black text-white font-outfit tracking-tighter leading-none select-none mb-8">
-                  GuestPass<span className="inline-block text-transparent bg-clip-text bg-gradient-to-br from-[#ff3152] via-[#ff5f3d] to-[#ff8c31] pr-[0.15em]">Pro</span>
-                </h1>
-
-                <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-white/[0.03] border border-white/10 text-[#ff8c31] text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl backdrop-blur-md">
-                  <Sparkles size={14} className="fill-[#ff8c31]/20" />
-                  <span>Professional Guest Management</span>
-                </div>
-              </div>
-            </header>
-
             <main className="w-full flex justify-center no-print">
-              <WifiForm key={formKey} onSubmit={handleGenerate} isLoading={false} />
+              <WifiForm key={formKey} onSubmit={handleGenerate} isLoading={isGenerating} />
             </main>
 
             <footer className="mt-24 mb-8 text-center no-print">
