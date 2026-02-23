@@ -13,7 +13,7 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
   const handlePrint = () => {
     const originalTitle = document.title;
     const safeSSID = config.ssid.replace(/[^a-z0-9\s\-_]/gi, '').trim();
-    document.title = `GuestPassPro - ${safeSSID || 'Network'}`;
+    document.title = `GuestPass Pro - ${safeSSID || 'Network'}`;
     window.print();
     setTimeout(() => { document.title = originalTitle; }, 500);
   };
@@ -37,8 +37,8 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
             </div>
           </div>
 
-          {/* QR Code Section - Optically Centered with negative margin to offset header weight */}
-          <div className="flex-grow w-full flex items-center justify-center min-h-0 relative -translate-y-3 z-0 print:translate-y-0">
+          {/* QR Code Section - Optically Centered */}
+          <div className="flex-grow w-full flex items-center justify-center min-h-0 relative z-0 py-4">
             <div className="w-full h-full max-w-[200px] max-h-[200px] aspect-square flex items-center justify-center relative">
               <img 
                 src={qrDataUrl} 
@@ -49,19 +49,40 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
             </div>
           </div>
 
+          {/* Network Details */}
+          <div className="w-full shrink-0 flex flex-col items-center gap-4 mb-8 z-10 px-4 text-center">
+            {(!config.hideSsidOnCard || (!config.hidePasswordOnCard && config.password)) && (
+              <div className="flex flex-col gap-4 w-full items-center">
+                {!config.hideSsidOnCard && (
+                  <div className="flex flex-col items-center leading-none">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Network</span>
+                    <span className="text-sm font-bold text-slate-900 font-mono bg-slate-100 px-3 py-1.5 rounded-lg tracking-tight break-all">{config.ssid}</span>
+                  </div>
+                )}
+                
+                {!config.hidePasswordOnCard && config.password && (
+                  <div className="flex flex-col items-center leading-none">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Password</span>
+                    <span className="text-sm font-bold text-slate-900 font-mono bg-slate-100 px-3 py-1.5 rounded-lg tracking-tight break-all">{config.password}</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Footer Branding */}
-          <div className="w-full shrink-0 mt-auto flex flex-col items-center gap-2 z-10">
+          <div className="w-full shrink-0 mt-auto flex flex-col items-center gap-3 z-10">
             {config.companyName && (
-               <div className="relative mb-0.5">
+               <div className="relative mb-1">
                  <p className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] text-center relative z-10">
                    {config.companyName}
                  </p>
-                 <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1/2 h-[1px] bg-[#ff8c31]/30 rounded-full"></div>
+                 <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1/2 h-[1px] bg-[#ff8c31]/30 rounded-full"></div>
                </div>
             )}
             
             <p className="text-[8px] font-bold text-slate-300 tracking-widest select-none">
-              GuestCardPro
+              GuestPass Pro
             </p>
           </div>
         </div>

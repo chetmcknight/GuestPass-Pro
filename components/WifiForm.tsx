@@ -42,7 +42,7 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
     >
       {/* Integrated Header inside the tile */}
       <div className="flex flex-col items-center mb-10 pb-10 border-b border-white/5 animate-in fade-in duration-700">
-        <div className="flex items-center mb-4 leading-none">
+        <div className="flex items-center mb-4 leading-none gap-3">
           <span className="text-4xl md:text-5xl font-[900] tracking-[-0.06em] font-outfit text-white">GuestPass</span>
           <span className="text-4xl md:text-5xl font-[900] tracking-[-0.06em] font-outfit text-transparent bg-clip-text bg-gradient-to-r from-[#ff3152] to-[#ff8c31] pr-4">Pro</span>
         </div>
@@ -75,6 +75,20 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
                 autoComplete="off"
                 onChange={(e) => setConfig({ ...config, ssid: e.target.value })}
               />
+              <div className="flex items-center mt-2 ml-1">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-200 ${config.hideSsidOnCard ? 'bg-[#ff3152] border-[#ff3152]' : 'border-slate-600 bg-transparent group-hover:border-slate-500'}`}>
+                    {config.hideSsidOnCard && <EyeOff size={10} className="text-white" />}
+                  </div>
+                  <input
+                    type="checkbox"
+                    className="hidden"
+                    checked={config.hideSsidOnCard}
+                    onChange={(e) => setConfig({ ...config, hideSsidOnCard: e.target.checked })}
+                  />
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-400 transition-colors">Hide on card</span>
+                </label>
+              </div>
             </div>
 
             <div>
@@ -99,6 +113,22 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
                   </button>
                 )}
               </div>
+              {config.security !== 'nopass' && (
+                <div className="flex items-center mt-2 ml-1">
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-200 ${config.hidePasswordOnCard ? 'bg-[#ff3152] border-[#ff3152]' : 'border-slate-600 bg-transparent group-hover:border-slate-500'}`}>
+                      {config.hidePasswordOnCard && <EyeOff size={10} className="text-white" />}
+                    </div>
+                    <input
+                      type="checkbox"
+                      className="hidden"
+                      checked={config.hidePasswordOnCard}
+                      onChange={(e) => setConfig({ ...config, hidePasswordOnCard: e.target.checked })}
+                    />
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-400 transition-colors">Hide on card</span>
+                  </label>
+                </div>
+              )}
             </div>
 
             <div className="pt-2">
