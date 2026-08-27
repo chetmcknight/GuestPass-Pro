@@ -27,7 +27,7 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
           
           {/* Header Section */}
           <div className="flex flex-col items-center w-full shrink-0 z-10">
-            <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100 rotate-3 print:border-slate-200 print:rotate-0 print:shadow-none shadow-sm transition-transform hover:rotate-6 duration-500">
+            <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100 print:border-slate-200 print:shadow-none shadow-sm">
               <Wifi size={24} className="text-slate-900" strokeWidth={2.5} />
             </div>
             
