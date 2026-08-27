@@ -35,14 +35,10 @@ export const generateQRCode = async (config: WifiConfig): Promise<string> => {
     qr.addData(wifiString);
     qr.make();
 
-    // Calculate module size to get approximately 1024px image
-    // This ensures high print quality
-    const moduleCount = qr.getModuleCount();
-    const cellSize = Math.max(Math.floor(1024 / moduleCount), 2);
-    const margin = 0; // Margin handled by CSS container
-
-    // Returns a base64 GIF image string
-    return qr.createDataURL(cellSize, margin);
+    // Use a vector image so QR modules stay crisp at any display or print size.
+    const margin = 1;
+    const svg = qr.createSvgTag(1, margin);
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
   } catch (err) {
     console.error('QR Generation Error:', err);
     throw err;

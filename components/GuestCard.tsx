@@ -43,8 +43,7 @@ const GuestCard: React.FC<GuestCardProps> = ({ result, onClose }) => {
               <img 
                 src={qrDataUrl} 
                 alt="WiFi QR Code" 
-                className="qr-code-img w-full h-full object-contain" 
-                style={{ imageRendering: 'pixelated' }}
+                className="qr-code-img w-full h-full object-contain"
               />
             </div>
           </div>
