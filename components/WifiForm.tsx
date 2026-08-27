@@ -25,6 +25,7 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
   });
   
   const [showPassword, setShowPassword] = useState(false);
+  const isFormIncomplete = !config.ssid.trim() || (config.security !== 'nopass' && !config.password);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -261,7 +262,7 @@ const WifiForm: React.FC<WifiFormProps> = ({ onSubmit, isLoading }) => {
 
       <div className="mt-8 pt-8 border-t border-white/5">
         <button
-          disabled={isLoading || !config.ssid}
+          disabled={isLoading || isFormIncomplete}
           type="submit"
           className="w-full relative group"
         >
